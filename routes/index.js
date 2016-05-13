@@ -9,16 +9,134 @@ module.exports = function(io) {
     var User = mongoose.model('User');
     var Posts =  mongoose.model('Posts');
     var Chats =  mongoose.model('Chats');
-
+	var exec = require('child_process').exec;
+	var util = require('util');
+	var thumbler = require('video-thumb');
+	var path = require('path');
+	var fs = require('fs');
+	var ss = require('socket.io-stream');
     var socket;
     var chat_username;
     var assert = require('assert');
-    
     var r = [];
     var x = [];
     var y = [];
     var h;
     
+	mongoose.connect('mongodb://localhost/savtrack', function(err,ok){
+      console.log("Connected to Mongo");
+    });
+	var VideoSchema = mongoose.Schema({
+       "name": String,
+       "username": String
+    });
+	
+	var Model = mongoose.model("Model", VideoSchema);
+
+       var files = {};
+	   io.on('connection', function(socket){
+
+               socket.on('Start', function(data){
+                 var name = data['Name'];
+                 files[name] = {
+                   FileSize : data['Size'],
+                   Data : "",
+                   Downloaded : 0
+                 }
+
+                 var place = 0;
+
+                 try{
+				  var stat = fs.statSync('public/Temp/'+name);
+                   if(stat.isFile()){
+                     console.log('Its a file');
+                     files[name]['Downloaded'] = stat.size;
+                     place = stat.size / 524288;
+                   }
+                 }
+                 catch(er){
+                   console.log('Its a new file:' +er);
+                 }
+
+                 fs.open("public/Temp/"+name, "a", 0755, function(err, fd){
+                   if(err){
+                     console.log(err);
+                   }
+                   else{
+                     files[name]['Handler'] = fd;
+                     socket.emit('MoreData', {'Place' : place, Percent : 0});
+                   }
+                 });
+
+               });
+
+            socket.on('Upload', function(data){
+
+                 var name = data['Name'];
+                 var narep = name.replace('.mp4','');
+                 files[name]['Downloaded'] += data['Data'].length;
+                 files[name]['Data'] += data['Data'];
+
+                 if(files[name]['Downloaded'] == files[name]['FileSize']){
+                   fs.write(files[name]['Handler'], files[name]['Data'], null, 'Binary', function(err, Writen){
+                      var inp = fs.createReadStream("public/Temp/"+name);
+                      var out = fs.createWriteStream("public/audio/"+name);
+                      util.pump(inp, out, function(){
+                        fs.unlink("public/Temp/"+name, function(){
+                         });
+                      });
+                      exec("ffmpeg -i public/audio/" + name  + " -ss 01:30 -r 1 -an -vframes 1 -f mjpeg public/audio/" + narep  + ".jpg", function(err){
+                        socket.emit('Done', {'Image' : 'public/audio/' + narep + '.jpg'});
+                      });
+                   });
+                 }
+                 else if(files[name]['Data'].length > 10485760){
+                   fs.write(files[name]['Handler'], files[name]['Data'], null, 'Binary', function(err, Writen){
+                     files[name]['Data'] = "";
+                     var place = files[name]['Downloaded'] / 524288;
+                     var percent = (files[name]['Downloaded'] / files[name]['FileSize']) * 100;
+                     socket.emit('MoreData', {'Place' : place, 'Percent' : percent});
+                   });
+                 }
+                 else{
+                   var place = files[name]['Downloaded'] / 524288;
+                   var percent = (files[name]['Downloaded'] / files[name]['FileSize']) * 100;
+                   socket.emit('MoreData', {'Place' : place, 'Percent' : percent});
+                 }
+               });
+       });
+	   
+	    router.post("/vdetails", function(req,res){
+         var newVid = new Model({"name":req.body.name,"username":req.body.username});
+		 //console.log(req.body);
+		 newVid.save(function(err, result){
+           if(err !== null){
+             console.log(err);
+             res.send("ERROR");
+           }else{
+             Model.find({},function(err, result){
+               if(err !== null){
+                 res.send("ERROR");
+               }else{
+                 res.json(result);
+               }
+             });
+           }
+         });
+       });
+
+       router.get("/details", function(req,res){
+		 console.log(req.query.username);
+         Model.find({username:req.query.username}, function(err,details){
+           if(err!== null){
+             console.log("Error getting details:" +err);
+             return;
+           }else{
+             res.send(details);
+           }
+         });
+       });
+	
     var auth = jwt({
         secret: 'SECRET',
         userProperty: 'payload'

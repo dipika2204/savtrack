@@ -5,11 +5,7 @@ $(document).ready(function() {
     var socket = io("http://localhost:3000/");
     
     $("#CurrSong").prop('disabled', true);
-    $("#list").hide();
-
-    $("#listBtn").click(function(){
-       $("#list").show(); 
-    });
+    
 
 	var element = $("#chat_win");
 	element.scrollTop = element.scrollHeight;
@@ -90,6 +86,8 @@ $(document).ready(function() {
       
       if(ifMatchedUser === "false"){
         $("#top-15").hide();
+		$("#upload").hide();
+		$
       }
 
       if(ifMatchedUser === "true"){
@@ -97,7 +95,8 @@ $(document).ready(function() {
       }
     }
 
-    socket.on("currentPausePlayResult", function(data) {
+	
+	socket.on("currentPausePlayResult", function(data) {
           
         var vid = document.getElementById("audio_src");
         $("#CurrSong").val(data.currSongSrc.split(".")[0]);
@@ -121,7 +120,8 @@ $(document).ready(function() {
         }
     });
 
-    $('.song').click(function() {
+    $(document).on('click', '.song', function() {
+		console.log("clicked");
         
         currSongName = $(this).attr("value");
         var sgName = "/audio/" + currSongName;

@@ -57,8 +57,7 @@ var main = function () {
         //  $("#loginTopNav").show();
         $("#mySavedPosts").hide();
         $.get("/posts", function (getData) {
-            console.log(getData);
-            $("div.container-room-list").empty();
+           $("div.container-room-list").empty();
             getData.forEach(function (reddit) {
                 var imgId = reddit.roomId;
                 var postsList = "<section id=" + imgId + " class ='room-item'>" +
@@ -143,10 +142,7 @@ var main = function () {
     
     //creating the room
 	
-	
-
-	
-	
+		
     $("#createbutton").click(function () {
         
         var room_name = $("#room_name").val();
@@ -159,11 +155,13 @@ var main = function () {
             contentType: 'application/json',
             success: function (result) {
                console.log("inside success");
-
+				var t= result.length;
+				t++;
                 $.ajax({
                     type: "POST",
                     url: "room_info",
                     data: JSON.stringify({
+						"_id":t,
                         "roomname": $("#room_name").val(),
                         "username": auth.currentUser()
                     }),

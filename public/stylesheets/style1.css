@@ -56,12 +56,8 @@ a, abbr, acronym, address, applet, big, blockquote, body, caption, cite, code, d
     vertical-align: baseline;
 }
 
-
-
-
-
 .join{
-	display: block;
+display: block;
 position: absolute;
 width: 100%;
 height: 100%;
@@ -79,7 +75,7 @@ top: 50%;
 }
 
 .user-count{
-	position: absolute;
+position: absolute;
 bottom: 4.7rem;
 right: 1rem;
 font-size: 1.3rem;
