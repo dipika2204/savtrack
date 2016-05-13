@@ -97,10 +97,7 @@ var main = function () {
 
     }
 	
-	if (!auth.isLoggedIn()) {
-		alert("Welcome please login to enjoy your favourite tracks");
-	}
-    
+	   
    
     $('#submit').click(function (event) {
         event.preventDefault();
