@@ -51,6 +51,7 @@ var main = function () {
 
     };
 
+	
 
     function postFunction() {
         // $("#logoutTopNav").hide();
@@ -73,9 +74,7 @@ var main = function () {
                 $(postsList).appendTo('div #container-room-list');
                 $("#postform")[0].reset();
                 $("ul.pagination").empty();
-
-
-            }); //end of foreach function
+			}); //end of foreach function
             //session storage variable
             $(".button-collapse").sideNav();
             $('.modal-trigger').leanModal();
@@ -97,7 +96,11 @@ var main = function () {
 		$(".postnews").show();
 
     }
-    //function login
+	
+	if (!auth.isLoggedIn()) {
+		alert("Welcome please login to enjoy your favourite tracks");
+	}
+    
    
     $('#submit').click(function (event) {
         event.preventDefault();
