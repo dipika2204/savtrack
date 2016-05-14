@@ -11,11 +11,9 @@ module.exports = function(io) {
     var Chats =  mongoose.model('Chats');
 	var exec = require('child_process').exec;
 	var util = require('util');
-	var thumbler = require('video-thumb');
 	var path = require('path');
 	var fs = require('fs');
-	var ss = require('socket.io-stream');
-    var socket;
+	var socket;
     var chat_username;
     var assert = require('assert');
     var r = [];

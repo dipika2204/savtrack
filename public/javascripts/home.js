@@ -4,7 +4,7 @@ $(document).ready(function() {
     var currSongName;
     var socket = io("http://localhost:3000/");
     
-    $("#CurrSong").prop('disabled', true);
+   // $("#CurrSong").prop('disabled', true);
     
 
 	var element = $("#chat_win");
@@ -99,7 +99,8 @@ $(document).ready(function() {
 	socket.on("currentPausePlayResult", function(data) {
           
         var vid = document.getElementById("audio_src");
-        $("#CurrSong").val(data.currSongSrc.split(".")[0]);
+		$("#CurrSong").val(data.currSongSrc.split(".")[0]);
+		$('#currentSong').html( data.currSongSrc.split(".")[0] );
         
         if (data.currentPausePlay === "true") {
             if (vid.paused) {
@@ -124,6 +125,7 @@ $(document).ready(function() {
 		console.log("clicked");
         
         currSongName = $(this).attr("value");
+		
         var sgName = "/audio/" + currSongName;
 
         $("#audio_src").attr("src", sgName);

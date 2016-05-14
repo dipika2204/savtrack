@@ -5,6 +5,15 @@
     font-size: 15px;
 }
 
+
+#CurrSong{
+	list-style-type: none;
+	color: white;
+    font-size: x-large;
+    float: left;
+    margin-left: -62%;
+}
+
 .description{ 
     color: #000; /* Fallback for older browsers */
     color: rgba(0, 0, 0, 0.5);
